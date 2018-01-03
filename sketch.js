@@ -17,9 +17,13 @@ var WinY;
 // var B;
 
 var x;
-let bufferSize = 1;
+
+let squareBuffer = 1;
+let wallbuffer = 10
+
 var boxSize = 10;
 let guiOffsetY = 100;
+let guiOffsetX = 300;
 
 
 
@@ -47,11 +51,12 @@ function UpdateInputYear() {
 }
 function UpdateInputYearTotal() {
   if (IsNumeric(this.value())) {
-    if ( this.value() <= 100 ) {
+    if ( this.value() <= 100 && this.value() > yearCurrent) {
       yearTotal = this.value()
     }
   }
 }
+
 
 
 function setup() {
@@ -60,16 +65,25 @@ function setup() {
   weekCurrent = 15;
   yearCurrent = 35;
 
-  // Setup Javascript Size
-  WinX = 10 + 10 + ((boxSize * (yearTotal)) + (bufferSize * yearTotal)) + 300;
-  WinY = 20 + ((boxSize * weekTotal) + (bufferSize * weekTotal));
+  // Setup canvas dimentions
+  //   *note that the WinX and WinY variables are written as the elements are displayed.
+  //   *Written as objects are visualized, left to right, and top to bottom.
+  //
+  //    eg: LEFT OF WINDOW   -->|  buffer | grid | buffer | etc | buffer  |<--  RIGHT OF WINDOW
+  //
+  //    eg: TOP OF WINDOW    -->|   buffer    |    grid    |    buffer    |<--  BOTTOM OF WINDOW
+  //
+  gridWidth = ((boxSize * (yearTotal)) + (squareBuffer * yearTotal))
+  gridHeight = ((boxSize * weekTotal) + (squareBuffer * weekTotal))
+  WinX =  wallbuffer + gridWidth + wallbuffer + guiOffsetX; // left to right
+  WinY =  wallbuffer + gridHeight + wallbuffer; // top to bottom
   print(WinX, WinY)
 
   // Setup User Inputs on Right GUI Panel
   yearInputUser = createInput(23,"text");
   yearInputUser.position(WinX - 256, guiOffsetY + 5)
   weekInputUser = createInput(33,"text");
-  weekInputUser.position(WinX - 256, guiOffsetY + 30)
+  weekInputUser.position(WinX - 256, guiOffsetY + 32)
   maxYearInputUser = createInput(yearTotal,"text");
   maxYearInputUser.position(WinX - 195, guiOffsetY + 455)
   weekInputUser.input(UpdateInputWeek);
@@ -119,10 +133,10 @@ function draw() {
       // }
 
       beginShape();
-      vertex(       10 + ((boxSize * r) + (bufferSize * r))      , 10 + ((boxSize * i) + (bufferSize * i))      );
-      vertex(       10 + ((boxSize * r) + (bufferSize * r))      , 20 + ((boxSize * i) + (bufferSize * i))      );
-      vertex(       10+10 + ((boxSize * r) + (bufferSize * r))   , 20 + ((boxSize * i) + (bufferSize * i))      );
-      vertex(       10+10 + ((boxSize * r) + (bufferSize * r))   , 20 + ((boxSize * i) + (bufferSize * i)) - 10   );
+      vertex(       wallbuffer + ((boxSize * r) + (squareBuffer * r))        , wallbuffer + ((boxSize * i) + (squareBuffer * i))      );
+      vertex(       wallbuffer + ((boxSize * r) + (squareBuffer * r))        , wallbuffer + 10 + ((boxSize * i) + (squareBuffer * i))      );
+      vertex(       wallbuffer + 10 + ((boxSize * r) + (squareBuffer * r))   , wallbuffer + 10 + ((boxSize * i) + (squareBuffer * i))      );
+      vertex(       wallbuffer + 10 + ((boxSize * r) + (squareBuffer * r))   , wallbuffer + 10 + ((boxSize * i) + (squareBuffer * i)) - 10   );
       endShape(CLOSE);
     }
   }
@@ -139,21 +153,23 @@ function draw() {
   text( t, WinX - 300 + ((300 - (10) - textWidth(t)) / 2), 50)
 
   fill(0);noStroke();textSize(20);textStyle(NORMAL);
-  t="You have lived...";
+  t="You have lived...\n  for                                  years\nand                                  weeks.";
   text( t, WinX - 300 + 5, guiOffsetY)
-  t="  for                                  years";
-  text( t, WinX - 300 + 5, guiOffsetY + 25)
-  t="and                                  weeks.";
-  text( t, WinX - 300 + 5, guiOffsetY + 49)
 
 
-  yearLeft = yearTotal - yearCurrent;
+  yearLeft = yearTotal - yearCurrent - 1;
   weekLeft = weekTotal - weekCurrent;
   fill(0);textSize(20);textStyle(NORMAL);
-  t=`There are ${yearLeft} years, and ${weekLeft}`;
+  if (yearLeft == 1 && weekLeft == 1) {
+    t=`There is ${yearLeft} year, and ${weekLeft} week\nleft, until you reach ${yearTotal}.`;
+  } else if (yearLeft == 1 && weekLeft != 1) {
+    t=`There is ${yearLeft} year, and ${weekLeft} weeks\nleft, until you reach ${yearTotal}.`;
+  } else if (yearLeft != 1 && weekLeft == 1) {
+    t=`There are ${yearLeft} years, and ${weekLeft}\nweek left, until you reach ${yearTotal}.`;
+  } else {
+    t=`There are ${yearLeft} years, and ${weekLeft}\nweeks left, until you reach ${yearTotal}.`;
+  }
   text( t, WinX - 300 + 5, guiOffsetY + 80);
-  t=`weeks left until you reach ${yearTotal}.`;
-  text( t, WinX - 300 + 5, guiOffsetY + 102);
 
 
   fill(0);noStroke();textSize(20);textStyle(BOLD);
