@@ -36,24 +36,22 @@ function IsNumeric(input)
 
 // Helper functions for User Input from GUI on Right Panel
 function UpdateInputWeek() {
-  if (IsNumeric(this.value())) {
-    if ( this.value() < weekTotal ) {
-      weekCurrent = this.value()
+  if (IsNumeric(Number(this.value()))) {
+    if ( Number(this.value()) < weekTotal ) {
+      weekCurrent = Number(this.value())
     }
   }
 }
 function UpdateInputYear() {
-  if (IsNumeric(this.value())) {
-    if ( this.value() < yearTotal ) {
-      yearCurrent = this.value()
+  if (IsNumeric(Number(this.value()))) {
+    if ( Number(this.value()) < yearTotal ) {
+      yearCurrent = Number(this.value())
     }
   }
 }
 function UpdateInputYearTotal() {
-  if (IsNumeric(this.value())) {
-    if ( this.value() <= 100 && this.value() > yearCurrent) {
-      yearTotal = this.value()
-    }
+  if ( Number(this.value()) <= 100 && Number(this.value()) > yearCurrent) {
+    yearTotal = Number(this.value())
   }
 }
 
@@ -75,19 +73,21 @@ function setup() {
   //
   gridWidth = ((boxSize * (yearTotal)) + (squareBuffer * yearTotal))
   gridHeight = ((boxSize * weekTotal) + (squareBuffer * weekTotal))
+  bottomLabel = 100
   WinX =  wallbuffer + gridWidth + wallbuffer + guiOffsetX; // left to right
-  WinY =  wallbuffer + gridHeight + wallbuffer; // top to bottom
+  WinY =  wallbuffer + gridHeight + wallbuffer + bottomLabel + wallbuffer; // top to bottom
   print(WinX, WinY)
 
   // Setup User Inputs on Right GUI Panel
-  yearInputUser = createInput(23,"text");
+  yearInputUser = createInput(yearCurrent,"text");
   yearInputUser.position(WinX - 256, guiOffsetY + 5)
-  weekInputUser = createInput(33,"text");
+  weekInputUser = createInput(weekCurrent,"text");
   weekInputUser.position(WinX - 256, guiOffsetY + 32)
   maxYearInputUser = createInput(yearTotal,"text");
-  maxYearInputUser.position(WinX - 195, guiOffsetY + 455)
-  weekInputUser.input(UpdateInputWeek);
+  maxYearInputUser.position(WinX - 195, guiOffsetY + 565)
+
   yearInputUser.input(UpdateInputYear);
+  weekInputUser.input(UpdateInputWeek);
   maxYearInputUser.input(UpdateInputYearTotal);
 
   // Create our Canvas
@@ -103,6 +103,9 @@ function setup() {
 
 function draw() {
   background(63,63,63);
+
+  gridWidth = ((boxSize * (yearTotal)) + (squareBuffer * yearTotal))
+  gridHeight = ((boxSize * weekTotal) + (squareBuffer * weekTotal))
 
   // Square Grid
   aged=false;
@@ -141,12 +144,59 @@ function draw() {
     }
   }
 
+  // Info Pane Below grid
+  fill(140,140,140);stroke(0);strokeWeight(2);
+  let x = wallbuffer
+  let y = wallbuffer + gridHeight + wallbuffer
+  let w = WinX - (wallbuffer + 0 + wallbuffer + guiOffsetX)
+  let h = WinY - (wallbuffer + gridHeight + wallbuffer + 0 + wallbuffer )
+  rect(x,y,w,h);
+
+  let lineDistY = 20
+  let lineDistX = 5
+  let lineHeight = 10
+  x = wallbuffer + lineDistX
+  y = wallbuffer + gridHeight + wallbuffer + lineDistY + 5
+  let xx = wallbuffer + gridWidth - lineDistX
+  let yy = wallbuffer + gridHeight + wallbuffer + lineDistY + 5
+  stroke(0);strokeWeight(1)
+  line(x, y, xx, yy)
+  for (r = 0; r < yearTotal; r++) {
+    strokeWeight(1);
+    lineHeight = 10
+    lineDistY = 20
+    if (r == yearTotal / 4 || r == yearTotal / 2 || r == yearTotal * 3 / 4 || r == 0 || r == yearTotal - 1 ) {
+      strokeWeight(2);
+      lineHeight = 20
+      lineDistY = 15
+
+      fill(0);noStroke();textSize(12);textStyle(NORMAL);
+      t = `${r}`
+      text( t, wallbuffer + lineDistX + ((boxSize + squareBuffer) * r) - (textWidth(t)/2),     wallbuffer + gridHeight + wallbuffer + 20 + 5 + 30);
+    }
+    stroke(0);
+    line(wallbuffer + lineDistX + ((boxSize + squareBuffer) * r),     wallbuffer + gridHeight + wallbuffer + lineDistY,     wallbuffer + lineDistX + ((boxSize + squareBuffer) * r),     wallbuffer + gridHeight + wallbuffer + lineDistY + lineHeight)
+
+    if (r == yearCurrent) {
+      stroke(0);strokeWeight(14);
+      point(wallbuffer + lineDistX + ((boxSize + squareBuffer) * r),     wallbuffer + gridHeight + wallbuffer + 20 + 5)
+      stroke(255);strokeWeight(12);
+      point(wallbuffer + lineDistX + ((boxSize + squareBuffer) * r),     wallbuffer + gridHeight + wallbuffer + 20 + 5)
+
+      t = `${yearCurrent}`
+      fill(255);stroke(0);strokeWeight(1);
+      rect(wallbuffer + lineDistX + ((boxSize + squareBuffer) * r) - (textWidth(t)+1),     wallbuffer + gridHeight + wallbuffer + 20 + 5 + 12, 2*textWidth(t), 21)
+      fill(0);noStroke();textSize(20);textStyle(BOLD);
+      text( t,      wallbuffer + lineDistX + ((boxSize + squareBuffer) * r) - ((textWidth(t) + 2)/2),     wallbuffer + gridHeight + wallbuffer + 20 + 5 + 30);
+
+    }
+
+  }
 
   // Right UI Panel
-  fill(140,140,140);
-  rect(WinX - 300 , 10, 290, WinY - 20);
-  fill(63,63,63);
-  rect(WinX - 300 , 70, 290 , 5)
+  fill(140,140,140);stroke(0);strokeWeight(2);
+  rect(WinX - guiOffsetX , wallbuffer, 290, 60);
+  rect(WinX - guiOffsetX , wallbuffer + 60 + (wallbuffer/2), guiOffsetX - wallbuffer , WinY - (wallbuffer + 60 + (wallbuffer/2) + 0 + wallbuffer))
 
   fill(0);noStroke();textSize(32);textStyle(BOLD);
   t=`Countdown to ${yearTotal}`;
@@ -174,6 +224,6 @@ function draw() {
 
   fill(0);noStroke();textSize(20);textStyle(BOLD);
   t=`Total Yrs:`;
-  text( t, WinX - 300 + 5, guiOffsetY + 473);
+  text( t, WinX - 300 + 5, guiOffsetY + 583);
 
 }
