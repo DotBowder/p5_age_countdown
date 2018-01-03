@@ -52,6 +52,11 @@ function UpdateInputYear() {
 function UpdateInputYearTotal() {
   if ( Number(this.value()) <= 100 && Number(this.value()) > yearCurrent) {
     yearTotal = Number(this.value())
+    gridWidth = ((boxSize * (yearTotal)) + (squareBuffer * yearTotal));
+    gridHeight = ((boxSize * weekTotal) + (squareBuffer * weekTotal));
+    WinX =  wallbuffer + gridWidth + wallbuffer + guiOffsetX; // left to right
+    WinY =  wallbuffer + gridHeight + wallbuffer + bottomLabel + wallbuffer; // top to bottom
+    resizeCanvas(WinX, WinY);
   }
 }
 
@@ -71,8 +76,8 @@ function setup() {
   //
   //    eg: TOP OF WINDOW    -->|   buffer    |    grid    |    buffer    |<--  BOTTOM OF WINDOW
   //
-  gridWidth = ((boxSize * (yearTotal)) + (squareBuffer * yearTotal))
-  gridHeight = ((boxSize * weekTotal) + (squareBuffer * weekTotal))
+  gridWidth = ((boxSize * (yearTotal)) + (squareBuffer * yearTotal));
+  gridHeight = ((boxSize * weekTotal) + (squareBuffer * weekTotal));
   bottomLabel = 100
   WinX =  wallbuffer + gridWidth + wallbuffer + guiOffsetX; // left to right
   WinY =  wallbuffer + gridHeight + wallbuffer + bottomLabel + wallbuffer; // top to bottom
@@ -80,11 +85,8 @@ function setup() {
 
   // Setup User Inputs on Right GUI Panel
   yearInputUser = createInput(yearCurrent,"text");
-  yearInputUser.position(WinX - 256, guiOffsetY + 5)
   weekInputUser = createInput(weekCurrent,"text");
-  weekInputUser.position(WinX - 256, guiOffsetY + 32)
   maxYearInputUser = createInput(yearTotal,"text");
-  maxYearInputUser.position(WinX - 195, guiOffsetY + 565)
 
   yearInputUser.input(UpdateInputYear);
   weekInputUser.input(UpdateInputWeek);
@@ -103,6 +105,10 @@ function setup() {
 
 function draw() {
   background(63,63,63);
+
+  yearInputUser.position(WinX - 256, guiOffsetY + 5)
+  weekInputUser.position(WinX - 256, guiOffsetY + 32)
+  maxYearInputUser.position(WinX - 195, guiOffsetY + 565)
 
   gridWidth = ((boxSize * (yearTotal)) + (squareBuffer * yearTotal))
   gridHeight = ((boxSize * weekTotal) + (squareBuffer * weekTotal))
